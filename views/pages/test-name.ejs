@@ -1,0 +1,27 @@
+<%- include("../partials/head", { title }) %>
+
+<section class="panel">
+  <div class="panel__top">
+    <div class="panel__kicker">MBTI 테스트</div>
+    <h1 class="panel__title">이름을 알려주시오.</h1>
+    <p class="panel__desc">결과 저장에 사용돼요. 닉네임도 가능해요.</p>
+  </div>
+
+  <% if (error) { %>
+    <div class="alert"><%= error %></div>
+  <% } %>
+
+  <form method="post" action="/test/start" class="form">
+    <label class="label" for="userName">이름</label>
+    <input class="input" id="userName" name="userName" placeholder="예) 혜지 / 홍길동 / 나으리" value="<%= userName %>" maxlength="30" required />
+    <button class="btn btn--primary btn--full" type="submit">질문 시작하기</button>
+  </form>
+
+  <div class="hint">
+    <div class="hint__title">TIP</div>
+    <div class="hint__text">질문 내용은 <b>DB에 미리 저장</b>되고, 완료하면 <b>이름/측정일/결과</b>가 저장돼요.</div>
+  </div>
+</section>
+
+<%- include("../partials/foot") %>
+

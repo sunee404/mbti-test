@@ -1,0 +1,22 @@
+<%- include("../partials/head", { title }) %>
+
+<section class="panel">
+  <div class="panel__top">
+    <div class="panel__kicker">500</div>
+    <h1 class="panel__title">전하… 문제가 생겼소.</h1>
+    <p class="panel__desc">잠시 후 다시 시도해 주세요.</p>
+  </div>
+
+  <div class="hint">
+    <div class="hint__title">오류 정보(개발용)</div>
+    <div class="hint__text"><%= (err && err.message) ? err.message : 'unknown error' %></div>
+  </div>
+
+  <div class="actions actions--stack">
+    <a class="btn btn--primary btn--full" href="/">홈으로</a>
+    <a class="btn btn--ghost btn--full" href="/admin/questions">질문 수정</a>
+  </div>
+</section>
+
+<%- include("../partials/foot") %>
+

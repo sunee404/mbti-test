@@ -1,0 +1,29 @@
+<%- include("../partials/head", { title }) %>
+
+<section class="panel">
+  <div class="panel__top">
+    <div class="panel__kicker">성격 유형</div>
+    <h1 class="panel__title">16가지 포근토끼 도감</h1>
+    <p class="panel__desc">유형마다 색과 무드가 달라요.</p>
+  </div>
+
+  <div class="typeGrid">
+    <% for (const item of items) { %>
+      <div class="typeCard">
+        <div class="typeCard__top">
+          <div class="pogeunbunny" style="--pt:<%= item.color %>">
+            <div class="pogeunbunny__face"></div>
+          </div>
+          <div class="typeCard__meta">
+            <div class="badge" style="--badge:<%= item.color %>"><%= item.mbti %></div>
+            <div class="typeCard__label"><%= item.label %></div>
+          </div>
+        </div>
+        <div class="typeCard__vibe"><%= item.vibe %></div>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include("../partials/foot") %>
+

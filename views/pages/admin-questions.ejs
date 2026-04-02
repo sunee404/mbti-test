@@ -1,0 +1,100 @@
+<%- include("../partials/head", { title }) %>
+
+<section class="panel">
+  <div class="panel__top">
+    <div class="panel__kicker">관리</div>
+    <h1 class="panel__title">질문 수정</h1>
+    <p class="panel__desc">정렬 번호(`sort_order`)로 질문 순서가 결정돼요.</p>
+  </div>
+
+  <% if (error) { %>
+    <div class="alert"><%= error %></div>
+  <% } %>
+
+  <div class="subpanel">
+    <div class="subpanel__title">질문 추가</div>
+    <form method="post" action="/admin/questions/add" class="form form--grid">
+      <div class="field">
+        <label class="label">차원</label>
+        <select class="select" name="dimension" required>
+          <option value="EI">EI</option>
+          <option value="SN">SN</option>
+          <option value="TF">TF</option>
+          <option value="JP">JP</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="label">정렬</label>
+        <input class="input" name="sort_order" type="number" min="1" step="1" required />
+      </div>
+      <div class="field field--full">
+        <label class="label">질문</label>
+        <input class="input" name="text" placeholder="예) 모임에서 나는 보통…" required />
+      </div>
+      <div class="field field--full">
+        <label class="label">선택지 A</label>
+        <input class="input" name="option_a" placeholder="A는 차원의 첫 글자(E/S/T/J)로 카운트돼요" required />
+      </div>
+      <div class="field field--full">
+        <label class="label">선택지 B</label>
+        <input class="input" name="option_b" placeholder="B는 차원의 두번째 글자(I/N/F/P)로 카운트돼요" required />
+      </div>
+      <button class="btn btn--primary btn--full" type="submit">추가하기</button>
+    </form>
+  </div>
+
+  <div class="subpanel">
+    <div class="subpanel__title">전체 질문 (<%= questions.length %>)</div>
+    <div class="qAdminList">
+      <% for (const q of questions) { %>
+        <div class="qAdmin">
+          <div class="qAdmin__head">
+            <div class="pill"><b>#<%= q.id %></b> · <%= q.dimension %> · 정렬 <%= q.sort_order %></div>
+            <div class="qAdmin__actions">
+              <form method="post" action="/admin/questions/<%= q.id %>/toggle" class="inline">
+                <button class="btn btn--tiny <%= q.is_active ? 'btn--green' : 'btn--gray' %>" type="submit">
+                  <%= q.is_active ? '활성' : '비활성' %>
+                </button>
+              </form>
+              <form method="post" action="/admin/questions/<%= q.id %>/delete" class="inline" onsubmit="return confirm('정말 삭제할까요?');">
+                <button class="btn btn--tiny btn--red" type="submit">삭제</button>
+              </form>
+            </div>
+          </div>
+
+          <form method="post" action="/admin/questions/<%= q.id %>/update" class="form form--grid">
+            <div class="field">
+              <label class="label">차원</label>
+              <select class="select" name="dimension" required>
+                <option value="EI" <%= q.dimension === 'EI' ? 'selected' : '' %>>EI</option>
+                <option value="SN" <%= q.dimension === 'SN' ? 'selected' : '' %>>SN</option>
+                <option value="TF" <%= q.dimension === 'TF' ? 'selected' : '' %>>TF</option>
+                <option value="JP" <%= q.dimension === 'JP' ? 'selected' : '' %>>JP</option>
+              </select>
+            </div>
+            <div class="field">
+              <label class="label">정렬</label>
+              <input class="input" name="sort_order" type="number" min="1" step="1" value="<%= q.sort_order %>" required />
+            </div>
+            <div class="field field--full">
+              <label class="label">질문</label>
+              <input class="input" name="text" value="<%= q.text %>" required />
+            </div>
+            <div class="field field--full">
+              <label class="label">선택지 A</label>
+              <input class="input" name="option_a" value="<%= q.option_a %>" required />
+            </div>
+            <div class="field field--full">
+              <label class="label">선택지 B</label>
+              <input class="input" name="option_b" value="<%= q.option_b %>" required />
+            </div>
+            <button class="btn btn--ghost btn--full" type="submit">이 질문 저장</button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include("../partials/foot") %>
+

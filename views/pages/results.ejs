@@ -1,0 +1,47 @@
+<%- include("../partials/head", { title }) %>
+
+<section class="panel">
+  <div class="panel__top">
+    <div class="panel__kicker">저장된 결과</div>
+    <h1 class="panel__title">결과 보기</h1>
+    <p class="panel__desc">최신 50개까지 표시돼요.</p>
+  </div>
+
+  <form method="get" action="/results" class="form">
+    <label class="label" for="q">이름 검색</label>
+    <div class="searchRow">
+      <input class="input" id="q" name="q" placeholder="예) 길동" value="<%= q %>" />
+      <button class="btn btn--primary" type="submit">검색</button>
+    </div>
+  </form>
+
+  <% if (!rows.length) { %>
+    <div class="empty">
+      <div class="empty__title">아직 결과가 없어요.</div>
+      <div class="empty__sub">먼저 MBTI 테스트를 진행해 주세요.</div>
+      <a class="btn btn--primary btn--full" href="/test">테스트 하러가기</a>
+    </div>
+  <% } else { %>
+    <div class="resultList">
+      <% for (const r of rows) { %>
+        <a class="resultRow" href="/results/<%= r.id %>">
+          <div class="resultRow__left">
+            <div class="pogeunbunny" style="--pt:<%= r.meta.color %>">
+              <div class="pogeunbunny__face"></div>
+            </div>
+          </div>
+          <div class="resultRow__mid">
+            <div class="resultRow__name"><%= r.user_name %></div>
+            <div class="resultRow__time"><%= r.measured_at %></div>
+          </div>
+          <div class="resultRow__right">
+            <div class="badge" style="--badge:<%= r.meta.color %>"><%= r.mbti %></div>
+          </div>
+        </a>
+      <% } %>
+    </div>
+  <% } %>
+</section>
+
+<%- include("../partials/foot") %>
+

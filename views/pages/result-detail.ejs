@@ -1,0 +1,54 @@
+<%- include("../partials/head", { title }) %>
+
+<section class="panel">
+  <div class="panel__top">
+    <div class="panel__kicker">결과 상세</div>
+    <h1 class="panel__title">#<%= row.id %> · <%= row.user_name %></h1>
+    <p class="panel__desc"><%= row.measured_at %></p>
+  </div>
+
+  <div class="result">
+    <div class="result__left">
+      <div class="pogeunbunny pogeunbunny--big" style="--pt:<%= meta.color %>">
+        <div class="pogeunbunny__face"></div>
+      </div>
+    </div>
+    <div class="result__right">
+      <div class="badge" style="--badge:<%= meta.color %>"><%= row.mbti %></div>
+      <div class="result__label"><%= meta.label %></div>
+      <div class="result__vibe"><%= meta.vibe %></div>
+    </div>
+  </div>
+
+  <% if (detail && detail.scores) { %>
+    <div class="scores">
+      <div class="scores__title">스코어</div>
+      <div class="scores__grid">
+        <div class="score">
+          <div class="score__k">E / I</div>
+          <div class="score__v"><b><%= detail.scores.EI.A %></b> : <%= detail.scores.EI.B %></div>
+        </div>
+        <div class="score">
+          <div class="score__k">S / N</div>
+          <div class="score__v"><b><%= detail.scores.SN.A %></b> : <%= detail.scores.SN.B %></div>
+        </div>
+        <div class="score">
+          <div class="score__k">T / F</div>
+          <div class="score__v"><b><%= detail.scores.TF.A %></b> : <%= detail.scores.TF.B %></div>
+        </div>
+        <div class="score">
+          <div class="score__k">J / P</div>
+          <div class="score__v"><b><%= detail.scores.JP.A %></b> : <%= detail.scores.JP.B %></div>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <div class="actions">
+    <a class="btn btn--ghost" href="/results">목록으로</a>
+    <a class="btn btn--primary" href="/test">새로 테스트</a>
+  </div>
+</section>
+
+<%- include("../partials/foot") %>
+

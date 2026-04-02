@@ -1,0 +1,45 @@
+<%- include("../partials/head", { title }) %>
+
+<section class="hero">
+  <div class="hero__card">
+    <div class="hero__badge">인간지능 말고… 성격지능</div>
+    <h1 class="hero__title">나에게 딱 맞는<br />MBTI 포근토끼는?</h1>
+    <p class="hero__desc">
+      질문은 짧게, 결과는 귀엽게.<br />
+      좀 더 가까운 쪽으로 선택해주세요.
+    </p>
+
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="/test">MBTI 테스트 시작</a>
+      <a class="btn btn--ghost" href="/types">성격 유형 보러가기</a>
+    </div>
+
+    <div class="hero__mini">
+      <div class="pogeunbunny" style="--pt:#f97316">
+        <div class="pogeunbunny__face"></div>
+      </div>
+      <div class="hero__miniText">
+        <div class="hero__miniTitle">포근토끼 컨셉</div>
+        <div class="hero__miniSub">유형마다 색/무드가 바뀌어요.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="grid">
+  <a class="card" href="/test">
+    <div class="card__title">MBTI테스트</div>
+    <div class="card__desc">이름 입력 → 순서대로 질문 → 결과 저장</div>
+  </a>
+  <a class="card" href="/admin/questions">
+    <div class="card__title">질문 수정</div>
+    <div class="card__desc">질문/선택지/순서를 DB에서 바로 편집</div>
+  </a>
+  <a class="card" href="/results">
+    <div class="card__title">결과 보기</div>
+    <div class="card__desc">측정일/이름/유형을 목록으로 확인</div>
+  </a>
+</section>
+
+<%- include("../partials/foot") %>
+

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title><%= title %> | MBTI 왕국</title>
+    <link rel="stylesheet" href="/public/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container">
+        <a class="brand" href="/">
+          <span class="brand__mark">MBTI</span>
+          <span class="brand__name">왕국</span>
+        </a>
+        <nav class="nav">
+          <% for (const item of nav) { %>
+            <a class="nav__link <%= currentPath.startsWith(item.href) ? 'is-active' : '' %>" href="<%= item.href %>">
+              <%= item.label %>
+            </a>
+          <% } %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container">

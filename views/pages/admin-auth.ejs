@@ -1,0 +1,50 @@
+<%- include("../partials/head", { title }) %>
+
+<section class="panel">
+  <div class="panel__top">
+    <div class="panel__kicker">관리자</div>
+    <h1 class="panel__title">비밀번호 확인 중…</h1>
+    <p class="panel__desc">잠시만 기다리시오.</p>
+  </div>
+
+  <div class="hint">
+    <div class="hint__title">안내</div>
+    <div class="hint__text">비밀번호를 입력해야 <b>질문 수정</b> 페이지가 열립니다.</div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var nextUrl = <%- JSON.stringify(nextUrl) %>;
+    alert("관리자 비밀번호를 입력하시오.");
+    var pw = prompt("관리자 비밀번호(4자리)를 입력하시오.");
+    if (pw === null) {
+      alert("취소하셨소. 홈으로 돌아가겠소.");
+      window.location.href = "/";
+      return;
+    }
+
+    fetch("/admin/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: pw, next: nextUrl })
+    })
+      .then(function (r) {
+        if (!r.ok) return r.json().catch(function () { return null; }).then(function (d) {
+          var msg = (d && d.message) ? d.message : "비밀번호가 틀렸소.";
+          throw new Error(msg);
+        });
+        return r.json();
+      })
+      .then(function (data) {
+        window.location.href = (data && data.redirect) ? data.redirect : "/admin/questions";
+      })
+      .catch(function (e) {
+        alert(e && e.message ? e.message : "인증에 실패했소.");
+        window.location.href = "/admin/auth?next=" + encodeURIComponent(nextUrl);
+      });
+  })();
+</script>
+
+<%- include("../partials/foot") %>
+

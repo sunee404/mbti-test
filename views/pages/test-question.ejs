@@ -1,0 +1,45 @@
+<%- include("../partials/head", { title }) %>
+
+<section class="panel">
+  <div class="panel__top">
+    <div class="panel__kicker"><%= userName %> 님의 MBTI 테스트</div>
+    <h1 class="panel__title">질문 <%= idx %> / <%= total %></h1>
+    <div class="progress" aria-label="진행률">
+      <div class="progress__bar" style="width:<%= Math.round((idx / total) * 100) %>%"></div>
+    </div>
+  </div>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert"><%= error %></div>
+  <% } %>
+
+  <div class="qcard">
+    <div class="qcard__dim"><%= question.dimension %></div>
+    <div class="qcard__text"><%= question.text %></div>
+  </div>
+
+  <form method="post" action="/test/q/<%= idx %>" class="choices">
+    <label class="choice <%= selected === 'A' ? 'is-selected' : '' %>">
+      <input type="radio" name="answer" value="A" <%= selected === 'A' ? 'checked' : '' %> />
+      <span class="choice__tag">A</span>
+      <span class="choice__text"><%= question.option_a %></span>
+    </label>
+    <label class="choice <%= selected === 'B' ? 'is-selected' : '' %>">
+      <input type="radio" name="answer" value="B" <%= selected === 'B' ? 'checked' : '' %> />
+      <span class="choice__tag">B</span>
+      <span class="choice__text"><%= question.option_b %></span>
+    </label>
+
+    <div class="actions">
+      <% if (idx > 1) { %>
+        <a class="btn btn--ghost" href="/test/q/<%= idx - 1 %>">이전</a>
+      <% } else { %>
+        <a class="btn btn--ghost" href="/test">이름 다시</a>
+      <% } %>
+      <button class="btn btn--primary" type="submit"><%= idx === total ? '결과 보기' : '다음' %></button>
+    </div>
+  </form>
+</section>
+
+<%- include("../partials/foot") %>
+

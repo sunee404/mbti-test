@@ -1,0 +1,33 @@
+:root{
+  /* Brand / Accent */
+  --c-violet:#7c3aed;
+  --c-pink:#ec4899;
+  --c-orange:#f97316;
+  --c-red:#ef4444;
+  --c-green:#22c55e;
+  --c-sky:#0ea5e9;
+
+  /* Neutrals */
+  --c-ink:#0f172a;
+  --c-muted:#64748b;
+  --c-slate-700:#334155;
+  --c-slate-400:#94a3b8;
+  --c-black:#000000;
+  --c-white:#ffffff;
+
+  /* App tokens */
+  --bg1:#fff7fb;
+  --bg2:#f6fbff;
+  --bg3:rgba(255,255,255,.86);
+  --ink:var(--c-ink);
+  --muted:var(--c-muted);
+  --card:var(--c-white);
+
+  --line:rgba(15,23,42,.10);
+  --shadow:0 14px 40px rgba(2,6,23,.10);
+  --radius:22px;
+
+  --primary:var(--c-violet);
+  --primary2:var(--c-orange);
+}
+
