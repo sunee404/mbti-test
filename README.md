@@ -1,4 +1,4 @@
-# MBTI 왕국 (Express + SQLite3)
+# MBTI 토끼 테스트 (Express + SQLite3)
 
 모바일(375~430px) 중심의 귀여운 MBTI 테스트 웹입니다. (캐릭터: 포근토끼)
 
