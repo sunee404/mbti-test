@@ -1,7 +1,10 @@
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 
-const DB_PATH = path.join(__dirname, "..", "data", "mbti.sqlite3");
+const DATA_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH
+  ? process.env.RAILWAY_VOLUME_MOUNT_PATH
+  : path.join(__dirname, "..", "data");
+const DB_PATH = path.join(DATA_DIR, "mbti.sqlite3");
 
 function openDb() {
   return new sqlite3.Database(DB_PATH);
