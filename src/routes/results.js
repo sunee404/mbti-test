@@ -4,6 +4,24 @@ const { typeMeta } = require("../mbti");
 
 const router = express.Router();
 
+function formatYmdDot(dateLike) {
+  const d = new Date(dateLike);
+  if (Number.isNaN(d.getTime())) return String(dateLike || "");
+
+  const parts = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(d);
+
+  const y = parts.find((p) => p.type === "year")?.value;
+  const m = parts.find((p) => p.type === "month")?.value;
+  const day = parts.find((p) => p.type === "day")?.value;
+  if (!y || !m || !day) return String(dateLike || "");
+  return `${y}.${m}.${day}`;
+}
+
 function parseIntSafe(v, fallback = null) {
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
@@ -33,7 +51,11 @@ router.get("/", async (req, res) => {
     res.render("pages/results", {
       title: "결과 보기",
       q,
-      rows: rows.map((r) => ({ ...r, meta: typeMeta(r.mbti) }))
+      rows: rows.map((r) => ({
+        ...r,
+        measured_at_label: formatYmdDot(r.measured_at),
+        meta: typeMeta(r.mbti)
+      }))
     });
   } finally {
     db.close();
@@ -62,7 +84,7 @@ router.get("/:id", async (req, res) => {
     }
     res.render("pages/result-detail", {
       title: `결과 #${row.id}`,
-      row,
+      row: { ...row, measured_at_label: formatYmdDot(row.measured_at) },
       meta: typeMeta(row.mbti),
       detail
     });

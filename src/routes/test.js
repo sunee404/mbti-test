@@ -4,16 +4,25 @@ const { scoreFromAnswers, typeMeta } = require("../mbti");
 
 const router = express.Router();
 
+function stripMbtiHint(text) {
+  return String(text || "").replace(/\s*\(([EISNTFJP])\)\s*$/i, "").trim();
+}
+
 async function fetchActiveQuestions() {
   const db = openDb();
   try {
-    return await all(
+    const rows = await all(
       db,
       `SELECT id, dimension, sort_order, text, option_a, option_b
        FROM questions
        WHERE is_active = 1
        ORDER BY sort_order ASC`
     );
+    return rows.map((q) => ({
+      ...q,
+      option_a: stripMbtiHint(q.option_a),
+      option_b: stripMbtiHint(q.option_b)
+    }));
   } finally {
     db.close();
   }
@@ -81,7 +90,8 @@ router.get("/q/:idx", async (req, res) => {
     total: questions.length,
     question: q,
     selected,
-    userName: req.session.userName
+    userName: req.session.userName,
+    error: null
   });
 });
 

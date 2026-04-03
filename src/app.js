@@ -64,7 +64,7 @@ async function main() {
 
   app.use((req, res, next) => {
     res.locals.nav = [
-      { href: "/test", label: "MBTI테스트" },
+      { href: "/test", label: "MBTI 테스트" },
       { href: "/types", label: "성격 유형" },
       { href: "/admin/questions", label: "질문 수정" },
       { href: "/results", label: "결과 보기" }
