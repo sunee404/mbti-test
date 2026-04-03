@@ -5,6 +5,39 @@ const router = express.Router();
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "0451";
 
+async function withTx(db, fn) {
+  await run(db, "BEGIN IMMEDIATE");
+  try {
+    const out = await fn();
+    await run(db, "COMMIT");
+    return out;
+  } catch (e) {
+    try {
+      await run(db, "ROLLBACK");
+    } catch {
+      // ignore rollback errors
+    }
+    throw e;
+  }
+}
+
+async function getMaxSortOrder(db) {
+  const r = await get(db, "SELECT COALESCE(MAX(sort_order), 0) AS mx FROM questions");
+  return r ? Number(r.mx || 0) : 0;
+}
+
+async function shiftSortOrders(db, whereSql, params, delta) {
+  const order = delta > 0 ? "DESC" : "ASC";
+  const rows = await all(
+    db,
+    `SELECT id, sort_order FROM questions WHERE ${whereSql} ORDER BY sort_order ${order}`,
+    params
+  );
+  for (const r of rows) {
+    await run(db, "UPDATE questions SET sort_order = ? WHERE id = ?", [r.sort_order + delta, r.id]);
+  }
+}
+
 function parseIntSafe(v, fallback = null) {
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
@@ -65,23 +98,33 @@ router.get("/questions", async (req, res) => {
 
 router.post("/questions/add", async (req, res) => {
   const dimension = String(req.body.dimension || "").toUpperCase();
-  const sortOrder = parseIntSafe(req.body.sort_order);
+  const sortOrderRaw = parseIntSafe(req.body.sort_order);
   const text = String(req.body.text || "").trim();
   const optionA = String(req.body.option_a || "").trim();
   const optionB = String(req.body.option_b || "").trim();
 
-  if (!["EI", "SN", "TF", "JP"].includes(dimension) || !sortOrder || !text || !optionA || !optionB) {
+  if (!["EI", "SN", "TF", "JP"].includes(dimension) || !text || !optionA || !optionB) {
     return res.status(400).redirect("/admin/questions");
   }
 
   const db = openDb();
   try {
-    await run(
-      db,
-      `INSERT INTO questions (dimension, sort_order, text, option_a, option_b, is_active)
-       VALUES (?, ?, ?, ?, ?, 1)`,
-      [dimension, sortOrder, text, optionA, optionB]
-    );
+    await withTx(db, async () => {
+      const mx = await getMaxSortOrder(db);
+      let sortOrder = sortOrderRaw;
+      if (!sortOrder || sortOrder < 1) sortOrder = mx + 1;
+      if (sortOrder > mx + 1) sortOrder = mx + 1;
+
+      // Insert-at-position: automatically push down later questions.
+      await shiftSortOrders(db, "sort_order >= ?", [sortOrder], +1);
+
+      await run(
+        db,
+        `INSERT INTO questions (dimension, sort_order, text, option_a, option_b, is_active)
+         VALUES (?, ?, ?, ?, ?, 1)`,
+        [dimension, sortOrder, text, optionA, optionB]
+      );
+    });
     res.redirect("/admin/questions");
   } catch (e) {
     const questions = await all(
@@ -93,7 +136,7 @@ router.post("/questions/add", async (req, res) => {
     res.status(400).render("pages/admin-questions", {
       title: "질문 수정",
       questions,
-      error: "추가에 실패했어요. (정렬 번호 중복/입력값 확인)"
+      error: "추가에 실패했어요. (입력값 확인)"
     });
   } finally {
     db.close();
@@ -103,24 +146,44 @@ router.post("/questions/add", async (req, res) => {
 router.post("/questions/:id/update", async (req, res) => {
   const id = parseIntSafe(req.params.id);
   const dimension = String(req.body.dimension || "").toUpperCase();
-  const sortOrder = parseIntSafe(req.body.sort_order);
+  const sortOrderRaw = parseIntSafe(req.body.sort_order);
   const text = String(req.body.text || "").trim();
   const optionA = String(req.body.option_a || "").trim();
   const optionB = String(req.body.option_b || "").trim();
 
-  if (!id || !["EI", "SN", "TF", "JP"].includes(dimension) || !sortOrder || !text || !optionA || !optionB) {
+  if (!id || !["EI", "SN", "TF", "JP"].includes(dimension) || !text || !optionA || !optionB) {
     return res.redirect("/admin/questions");
   }
 
   const db = openDb();
   try {
-    await run(
-      db,
-      `UPDATE questions
-       SET dimension = ?, sort_order = ?, text = ?, option_a = ?, option_b = ?
-       WHERE id = ?`,
-      [dimension, sortOrder, text, optionA, optionB, id]
-    );
+    await withTx(db, async () => {
+      const current = await get(db, "SELECT id, sort_order FROM questions WHERE id = ?", [id]);
+      if (!current) return;
+
+      const mx = await getMaxSortOrder(db);
+      let sortOrder = sortOrderRaw;
+      if (!sortOrder || sortOrder < 1) sortOrder = 1;
+      if (sortOrder > mx) sortOrder = mx;
+
+      const from = Number(current.sort_order);
+      const to = Number(sortOrder);
+
+      // Shift others first, then update the target, to satisfy UNIQUE(sort_order).
+      if (to < from) {
+        await shiftSortOrders(db, "id != ? AND sort_order >= ? AND sort_order < ?", [id, to, from], +1);
+      } else if (to > from) {
+        await shiftSortOrders(db, "id != ? AND sort_order > ? AND sort_order <= ?", [id, from, to], -1);
+      }
+
+      await run(
+        db,
+        `UPDATE questions
+         SET dimension = ?, sort_order = ?, text = ?, option_a = ?, option_b = ?
+         WHERE id = ?`,
+        [dimension, to, text, optionA, optionB, id]
+      );
+    });
     res.redirect("/admin/questions");
   } catch (e) {
     const questions = await all(
@@ -132,7 +195,7 @@ router.post("/questions/:id/update", async (req, res) => {
     res.status(400).render("pages/admin-questions", {
       title: "질문 수정",
       questions,
-      error: "수정에 실패했어요. (정렬 번호 중복/입력값 확인)"
+      error: "수정에 실패했어요. (입력값 확인)"
     });
   } finally {
     db.close();

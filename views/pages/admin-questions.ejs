@@ -4,7 +4,7 @@
   <div class="panel__top">
     <div class="panel__kicker">관리</div>
     <h1 class="panel__title">질문 수정</h1>
-    <p class="panel__desc">정렬 번호(`sort_order`)로 질문 순서가 결정돼요.</p>
+    <p class="panel__desc">정렬 번호(`sort_order`)로 질문 순서가 결정돼요. 중간 번호로 추가/이동하면 뒤 질문은 자동으로 밀립니다.</p>
   </div>
 
   <% if (error) { %>
@@ -25,7 +25,7 @@
       </div>
       <div class="field">
         <label class="label">정렬</label>
-        <input class="input" name="sort_order" type="number" min="1" step="1" required />
+        <input class="input" name="sort_order" type="number" min="1" step="1" placeholder="비우면 맨 뒤에 추가" />
       </div>
       <div class="field field--full">
         <label class="label">질문</label>
